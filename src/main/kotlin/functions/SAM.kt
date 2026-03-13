@@ -1,4 +1,4 @@
-package org.example.functions
+package functions
 
 // What are functional (SAM) interfaces?
 /*

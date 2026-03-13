@@ -120,6 +120,14 @@ fun transformationOperators() {
     }
 
     println(numbers) // Prints: [1, 3, 5, 7]
+    println("--------Reduce---------")
+    // (1, 2, 3, 4, 5, 6, 7, 8)
+    // acc starts as 1
+    // acc then add previous result to the next element such as 1+2 = 3
+    // 2. acc = 3, 3+3 = 6
+    // 3. acc = 6, 6+4 = 10
+    val resultOfReduce = numbers.reduce { acc, i -> acc * i }
+    println(resultOfReduce) // 28
 
 }
 

@@ -1,7 +1,20 @@
 package org.example.basic
 
-import kotlin.reflect.KClass
-
+/*
+* Val - Read-only
+* val in Kotlin makes the reference read-only, meaning the variable cannot be reassigned. However, it does not guarantee immutability because the object's internal state may still change if the object itself is mutable.
+*  val = read-only reference
+*  var = mutable reference
+*
+* Example:
+* val list = MutableList
+    list  ----->  [1,2,3]
+* Allowed:
+    list.add(4)
+* Not allowed:
+    list = new MutableList
+*
+* */
 // Integer Types
 val one = 1 //int
 val threeBillion = 3000000000 // long

@@ -1,9 +1,12 @@
-package org.example.coroutines
+package coroutines
 
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.asFlow
@@ -18,6 +21,7 @@ import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flatMapMerge
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.flow.onEach
@@ -82,8 +86,9 @@ class UserImpl {
 //            flatMapMerge()
 //            flatMapLatest()
 //            testSimpleException()
-            catchWithCoroutine()
-            checkFlowCompleted()
+//            catchWithCoroutine()
+//            checkFlowCompleted()
+            flowLaunchInOp()
         }
     }
 
@@ -195,9 +200,10 @@ class UserImpl {
     // To flatten the upper flow -  It flats the flows one by one as it emits and then they are flattened
     @OptIn(ExperimentalCoroutinesApi::class)
     suspend fun flattenFlowsWithMap() {
-        (1..3).asFlow().onEach { delay(100) }.flatMapConcat { value -> flattenFlows(value) }.collect {
-            println("Before Flatten the flows:: $it")
-        }
+        (1..3).asFlow().onEach { delay(100) }.flatMapConcat { value -> flattenFlows(value) }
+            .collect {
+                println("Before Flatten the flows:: $it")
+            }
     }
 
     // To flatten the flows concurrently, we can use the flatMapMerge
@@ -266,12 +272,32 @@ class UserImpl {
             println("Catch with Coroutine Catch: $value")
         }
     }
+
     // Check the flow completed or not
     // The onCompletion operator, unlike catch, does not handle the exception. As we can see from the above example code, the exception still flows downstream. It will be delivered to further onCompletion operators and can be handled with a catch operator.
-    suspend fun checkFlowCompleted(){
-        simple().onCompletion { cause -> if (cause!= null) println("Flow completed exceptionally") }
+    suspend fun checkFlowCompleted() {
+        simple().onCompletion { cause -> if (cause != null) println("Flow completed exceptionally") }
             .catch { cause -> println("Caught exception") }
             .collect { value -> println(value) }
     }
 
+    /**
+     * `launchIn()` is a terminal Flow operator that starts collecting the Flow inside a provided `CoroutineScope`.
+     * It is equivalent to calling `scope.launch { flow.collect() }`, but it allows flows to remain part of a
+     * declarative operator chain and integrates well with lifecycle-aware scopes like `viewModelScope or lifecycleScope`.*/
+    suspend fun flowLaunchInOp() {
+        println("Here in flow")
+        val scope = CoroutineScope(Job() + Dispatchers.Default)
+        coroutineScope {
+            simple().onEach { v ->
+                println(v)
+            }.catch { e -> println("Caught ->$e") }.launchIn(this)
+        }
+
+    }
+
+}
+
+fun main() {
+    val impl = UserImpl()
 }

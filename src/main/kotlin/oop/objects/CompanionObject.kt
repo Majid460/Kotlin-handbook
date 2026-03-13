@@ -1,5 +1,8 @@
 package org.example.oop.objects
 
+import org.example.oop.classes.U
+
+
 
 class User private constructor(private val name: String) {
 

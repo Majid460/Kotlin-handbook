@@ -1,10 +1,24 @@
-package org.example.oop
+package oop
+
+import org.example.oop.TemperatureControl
+
+
+
 
 // Inheritance
 
 // All Classes.kt in Kotlin have a common superclass, Any, which is the default superclass for a class with no supertypes declared:
 
-
+/**
+* Difference between inheritance and composition
+Good answer:
+* ## Inheritance:
+ *  models an "is-a" relationship where a subclass extends behavior from a parent class.
+ * ## Composition:
+ *  models a "has-a" relationship where a class contains other objects to reuse functionality.
+ *
+ * Modern software design prefers composition because it reduces coupling and increases flexibility.
+* */
 class Example // Implicitly inherits from Any
 
 // Example 1

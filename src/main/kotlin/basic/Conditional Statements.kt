@@ -1,12 +1,36 @@
-package org.example.basic
+package basic
+
+import kotlinx.coroutines.Delay
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.runBlocking
+import java.util.Timer
+import kotlin.math.pow
+import kotlin.properties.Delegates
+import kotlin.properties.ObservableProperty
 
 
-// When conditional statement
+// If else
+fun ifElse() {
+    val  a = 2
+    var b = a * a
+    // use pow()
+    var power = a.toDouble().pow(2)
+    val x = if (a > 2) "Greater" else "Smaller or Equal"
+    println("b: $b, x: $x, power: $power")
+}
 
-
-fun main() {
+/** ## When conditional statement
+ *
+ * `is` used in when statement to check the type of the variable.
+ *
+ * `in` is used in when statement to check the range of the variable.
+ *
+ * `no` is or in is used when statement to check the value of the variable
+ * */
+fun whenStatement(){
     print("Enter a input: ")
     val x = readln()
+    //when you don't provide an argument in parentheses, each branch is a boolean condition. The first branch that evaluates to true is executed.
     val type = when {
         x.toIntOrNull() != null -> "int"
         x.toDoubleOrNull() != null -> "double"
@@ -23,10 +47,36 @@ fun main() {
         }
         "double"-> println("Processing the double")
         else -> {
-           val output = when(x){
-                is String -> x.startsWith("ID-")
-            }
+            val output = x.startsWith("ID-")
             println("Output :: $output")
         }
+    }
+}
+fun whenEx(){
+    var x : Int by Delegates.observable(1,{ prop, old, new ->
+        runWhen(new)
+    })
+    runWhen(x)   // trigger initial value
+    runBlocking {
+        delay(3000)
+        x = 2
+    }
+
+}
+fun runWhen(i:Int){
+    when(i){
+        1 -> println("It is 1")
+        2 -> println("It is 2")
+    }
+}
+
+fun main() {
+//    whenStatement()
+//    ifElse()
+    whenEx()
+    val x = listOf(1,2,3)
+
+    x.map {
+        println(it)
     }
 }

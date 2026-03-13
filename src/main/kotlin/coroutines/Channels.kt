@@ -1,13 +1,17 @@
 package coroutines
 
 
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.Channel.Factory.BUFFERED
 import kotlinx.coroutines.channels.Channel.Factory.CONFLATED
 import kotlinx.coroutines.channels.Channel.Factory.UNLIMITED
+import kotlinx.coroutines.channels.toList
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeout
 import kotlin.time.Duration.Companion.seconds
 
@@ -34,9 +38,6 @@ import kotlin.time.Duration.Companion.seconds
 
 suspend fun createAChannel() {
     val confChannel = Channel<String>(CONFLATED)
-    val buffChannel = Channel<String>(10)
-    val unlimitChannel = Channel<String>(UNLIMITED)
-    val rendezvousChannel = Channel<String>() // Rendezvous
 
     // ConfChannel
     coroutineScope {
@@ -57,58 +58,88 @@ suspend fun createAChannel() {
                 println("Conflated Channels: Received the value in conflated channel: $x")
             }
         }
-        // Buffered Channel
-        launch {
-            buffChannel.send("Buffered Channel Send 1")
-            println("Buffered Channels: Sent the value in Buffered channel 1")
 
-        }
-        launch {
-            buffChannel.send("Buffered Channel Send 2")
-            println("Buffered Channels: Sent the value in Buffered channel 2")
+    }
 
-        }
-        launch {
-            delay(1.seconds)
-            repeat(3) {
-                val x = buffChannel.receive()
-                println("Buffered Channels: Received the value in Buffered channel: $x")
+}
+suspend fun bufferedChannel() {
+
+    val channel = Channel<String>(2)
+
+    coroutineScope {
+
+        repeat(4) { i ->
+            launch {
+                println("Trying send ${i+1}")
+                channel.send("Send ${i+1}")
+                println("Sent ${i+1}")
             }
         }
+
         launch {
-            delay(1.seconds)
-            repeat(3) {
-                val x = buffChannel.receive()
-                println("Buffered Channels: Received the value in Buffered channel: $x")
+            delay(5.seconds)
+
+            for(x in channel) {
+                println("Received $x")
             }
         }
+        delay(1.seconds)
+
+        channel.close()
+    }
+}
+suspend fun unlimitChannel(){
+    val unlimitChannel = Channel<String>(UNLIMITED)
+
+    withContext(Dispatchers.Default){
         // Unlimited Channel
+        //Send
         launch {
-            unlimitChannel.send("Unlimited Channel Send 1")
-            println("Unlimited Channels: Sent the value in Unlimited channel 1")
-
+            val x1 = "Unlimited Channel Send 1"
+            println("Sending $x1 from ::${Thread.currentThread().name} ")
+            unlimitChannel.send("")
         }
         launch {
-            unlimitChannel.send("Unlimited Channel Send 2")
-            println("Unlimited Channels: Sent the value in Unlimited channel 2")
-
+            val x2 = "Unlimited Channel Send 2"
+            println("Sending $x2 from ::${Thread.currentThread().name} ")
+            unlimitChannel.send(x2)
         }
+
+        // Receive
         launch {
             delay(1.seconds)
-            repeat(3) {
+            repeat(unlimitChannel.toList().size) {
                 val x = unlimitChannel.receive()
-                println("Unlimited Channels: Received the value in Unlimited channel: $x")
-            }
-        }
-        launch {
-            delay(1.seconds)
-            repeat(3) {
-                val x = unlimitChannel.receive()
-                println("Unlimited Channels: Received the value in Unlimited channel: $x")
+                println("Receiving unlimit from ::${Thread.currentThread().name} value is:: $x ")
             }
         }
     }
 
+}
+suspend fun randezousChannel(){
+    val rendezvousChannel = Channel<Int>() // Rendezvous
+    // Randezvous Channel
+    // Sending
+    withContext(Dispatchers.Default){
+        launch {
+            println("Sending Rand from ::${Thread.currentThread().name}")
+            println("sending 1")
+            rendezvousChannel.send(1)          // suspends HERE until someone receives
+            println("sending 2")     // only runs after 1 is received
+            rendezvousChannel.send(2)
+            rendezvousChannel.close()
+        }
+        // Receiving
+        launch {
+            println("Receiving Rand from ::${Thread.currentThread().name}")
+            delay(1000)
+            val value = rendezvousChannel.receive()   // producer resumes now
+            println("got: $value")
+            for (value in rendezvousChannel) {
+                println("got in loop: $value")
+            }
+        }
+    }
 }
 var acquired = 0
 class Resource {
@@ -148,4 +179,12 @@ suspend fun passMessages() {
         }
     }
     println(acquired)
+}
+
+fun main() {
+    runBlocking {
+       // randezousChannel()
+        bufferedChannel()
+    }
+
 }

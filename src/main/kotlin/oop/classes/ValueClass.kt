@@ -1,6 +1,10 @@
-package org.example.oop.classes
+package oop.classes
 
-/*
+import org.example.oop.classes.U
+
+
+
+/**
 * A value class is a special kind of class introduced to optimize performance by avoiding
 unnecessary object allocation. Value classes wrap a single value but are inlined at runtime,
 meaning they are treated as the underlying value rather than a full object. This makes them

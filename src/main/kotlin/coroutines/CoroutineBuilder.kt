@@ -3,6 +3,8 @@ package coroutines
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
@@ -29,6 +31,40 @@ suspend fun CoroutineScope.launchAsBuilder(){
     }
     println("Scope continues")
 }
+// It starts a new coroutine without blocking the rest of the scope, inside an existing coroutine scope.
+suspend fun performBackgroundWork() = coroutineScope { // this: CoroutineScope
+    // Starts a coroutine that runs without blocking the scope
+    val job =  this.launch {
+        // Suspends to simulate background work
+        delay(100.milliseconds)
+        println("Sending notification in background")
+    }
+    job.join() // If i remove this it will not wait and execute the print first
+    // Main coroutine continues while a previous one suspends
+    println("Scope continues")
+}
+/*
+* Sending notification in background
+* Scope continues
+* */
+// Without job
+
+suspend fun performBackgroundWorkWithoutJob() = coroutineScope { // this: CoroutineScope
+    // Starts a coroutine that runs without blocking the scope
+     this.launch {
+        // Suspends to simulate background work
+        delay(100.milliseconds)
+        println("Sending notification in background")
+    }
+    // Main coroutine continues while a previous one suspends
+    println("Scope continues")
+}
+/*
+* Scope continues
+* Sending notification in background
+* */
+
+
 // 2. CoroutineScope.async
 // The CoroutineScope.async() coroutine builder function is an extension function on CoroutineScope.
 // It starts a concurrent computation inside an existing coroutine scope and returns a Deferred handle that represents an eventual result.
@@ -49,6 +85,46 @@ suspend fun CoroutineScope.asyncAsBuilder() = withContext(Dispatchers.Default) {
     println(firstPage.await())
     println("Pages are equal: $pagesAreEqual")
 }
+
+// Parallel processing with Async Wait
+suspend fun parallelProcessing() = withContext(Dispatchers.Default) {
+    val firstPage = async {
+        delay(5000.milliseconds)
+        "First page"
+//        throw RuntimeException("Error")
+    }
+    val secondPage = async {
+        delay(6000.milliseconds)
+        "Second page"
+    }
+    println(awaitAll(firstPage, secondPage))
+
+}
+// coroutineScope()
+suspend fun coroutineScopeBuilder() {
+    coroutineScope{
+        delay(100)
+        println("coroutineScopeBuilder")
+    }
+}
+
+fun main() {
+    runBlocking {
+        performBackgroundWork()
+        performBackgroundWorkWithoutJob()
+//        launchAsBuilder()
+//        asyncAsBuilder()
+//        runCatching {
+//            coroutineScopeBuilder()
+//            parallelProcessing()
+//
+//        }.onFailure {
+//            println(it.message)
+//        }
+    }
+}
+
+
 // 3. runBlocking()
 //The runBlocking() coroutine builder function creates a coroutine scope and blocks the current thread until the coroutines launched in that scope finish.
 //Use runBlocking() only when there is no other option to call suspending code from non-suspending code:

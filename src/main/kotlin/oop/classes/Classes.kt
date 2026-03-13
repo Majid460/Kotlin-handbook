@@ -2,7 +2,26 @@ package oop.classes
 
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
+import kotlin.properties.Delegates
+import kotlin.reflect.KProperty
 
+
+
+// Delegates lets delegate the value of variable from one class to another class
+// It helps to create custom getter and setter for the property
+
+class DelegateAge(private var age: Int = 0) {
+    // operator allows functions to be used with special syntax.
+    // Operator function is used as
+    operator fun setValue(thisRef: Any?, property: KProperty<*>, value: Int) {
+        println("Value set to $value")
+        age = value
+    }
+
+    operator fun getValue(thisRef: Any?, property: KProperty<*>): Int {
+        return age
+    }
+}
 
 // A class is a blueprint or template for creating objects (instances) that share:
 // properties (data, like name, age, color)
@@ -11,12 +30,77 @@ import kotlinx.coroutines.runBlocking
 //A class defines what an object is and what it can do.
 
 class ClassName {
-    companion object{
+    // 2. Called after creating the object
+    // Called after companion object
+    init {
+        // Primary constructor called
+        println("Init block called")
+    }
+
+    // 3. Called after constructor
+    // Called after init block
+    // Secondary constructor
+    // Secondary constructor must call the primary constructor
+    constructor() {
+        println("Constructor called")
+    }
+
+    // 1. Companion Called first before creating the object
+    // Jvm loads the Class first before creating the object in memory
+    companion object {
+        init {
+            println("Static block called")
+        }
+
         const val AA = ""
-        fun display(){
+        fun display() {
             println("First loaded")
         }
     }
+
+    // Backing Field - Actual Storage of variable used for recurrent changes
+    var name: String = ""
+        set(value) {
+            field = value.trim()
+        }
+        get() = field.uppercase()
+
+    // Delegate properties
+    var age: Int by DelegateAge()
+
+    // Other delegates
+    // 1. lazy - Use case: initialize only when first accessed. Used with only val
+    fun lazyDelegate(){
+        val lazyValue: String by lazy {
+            println("Computed!")
+            "Hello"
+        }
+
+        println(lazyValue)
+    }
+
+    // 2. Observable - Use case: observe changes to a property. Used with var
+    fun observableDelegate(){
+        var name: String by Delegates.observable("Default"){
+            prop, old, new ->
+            println("$old -> $new")
+        }
+        name = "New"
+        println(name)
+    }
+    // 3. Vetoable - Use case: veto changes to a property. Used with var
+    // validate updates before accepting them.
+    fun vetoableDelegate(){
+        var age: Int by Delegates.vetoable(0){
+            prop, old, new ->
+            new > old && new > 18
+    }
+        age = 10
+        println(age)
+    }
+
+
+
 }
 // Data class:
 // Data classes in Kotlin are primarily used to hold data.
@@ -103,6 +187,12 @@ fun <T> genericFun(item: T): List<T> {
 
 
 fun main() {
+    val classCompanion = ClassName()
+    classCompanion.name = "Default"
+    println(classCompanion.name)
+    classCompanion.age = 10
+    println(classCompanion.age)
+
     val clas = ClassName.display()
     val originalUser = User("Jhon", age = 10)
     // The copy() function creates a shallow copy of the instance.
@@ -151,7 +241,9 @@ fun main() {
             println("Values:: $v")
         }
     }
-    arrayOf("A", "B", "C").forEach { str -> genericFun(str).filter { s -> s!="A" }.also { v -> println("Values:: $v") } }
+    arrayOf("A", "B", "C").forEach { str ->
+        genericFun(str).filter { s -> s != "A" }.also { v -> println("Values:: $v") }
+    }
 
 
 }

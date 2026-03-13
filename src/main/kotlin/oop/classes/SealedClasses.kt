@@ -10,6 +10,11 @@ sealed class Payment {
     data class CreditCard(val cardNumber: String) : Payment()
     data class PayPal(val email: String) : Payment()
 }
+/**
+ * Sealed classes can define primary or secondary constructors, allowing shared state and logic across subclasses. Each subclass must call the sealed class constructor when extending it. This makes sealed classes useful for modeling state hierarchies where common properties or behavior need to be shared.*/
+sealed class U(open val message: String, open val timeStamp:Long)
+data class UT(override val message: String, override val timeStamp:Long): U(message,timeStamp)
+
 
 fun processPayment(payment: Payment) {
     when (payment) {

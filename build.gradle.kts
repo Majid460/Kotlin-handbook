@@ -12,12 +12,15 @@ repositories {
 }
 
 dependencies {
+    implementation("junit:junit:4.12")
     testImplementation(kotlin("test"))
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.9.0")
+    implementation(kotlin("test"))
+    testImplementation("io.mockk:mockk:1.13.10")
 }
 
 tasks.test {
-    useJUnitPlatform()
+    useJUnit()
 }
 kotlin {
     jvmToolchain(8)

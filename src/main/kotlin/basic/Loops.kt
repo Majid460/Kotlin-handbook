@@ -4,8 +4,72 @@ import kotlin.io.path.Path
 
 // Loops
 
-// 1. For loop
+// 1. For loop is used to iterate through ranges, arrays, collections, or anything else that provides an iterator.
+fun forLoop(){
+    val arr = arrayOf(1,2,3,4,5)
+    print("The elements of array: ")
+    for(i in arr){
+        // is used on elements directly
+        print("$i ")
+    }
+    println()
+    print("Indices of arrays:: ")
+    for (i in arr.indices){
+        // is used on indices
+        print("${i} ")
+    }
+    println()
+    print("The range of array:: ")
+    for(i in 1.rangeTo(5)){
+        print("${i} ")
+    }
+    println()
+    print("Range with ..::")
+    for(i in 1..5){ // Include the last number
+        print("${i} ")
+    }
+    println()
+    print("Range with until::")
+    for(i in 1 until 5){ // Exclude the last number
+        print("${i} ")
+    }
+    println()
+    print("Range with step::")
+    for(i in 1..5 step 2){ // add step to control the increment
+        print("${i} ")
+    }
+    println()
+    print("Back propagation in array:: ")
+    for (i in arr.size-1 downTo 0){
+        print("${arr[i]} ")
+    }
+    println()
+    print("Back propagation in array with step:: ")
+    for(i in arr.size-1 downTo 0 step 2){
+        print("${arr[i]} ")
+    }
+    println()
+    print("Back propagation in range:")
+    for (i in 5 downTo 1){
+        print("$i ")
+    }
+    println()
+    print("Back propagation in range with step:")
+    for (i in 5 downTo 1 step 2){
+        print("$i ")
+    }
+    println()
+    print("Back propagation in range with until:")
+    for (i in 5 downTo 1 step 2){
+        print("$i ")
+    }
+    println()
+    for((i,v) in arr.withIndex()){
+        print("${i} ${v} ")
+    }
+}
 fun main() {
+    forLoop()
     println("Closed-ended range:")
     // Closed range means the last element in range is included
     for (i in 1..6) {
