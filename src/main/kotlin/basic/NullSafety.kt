@@ -22,8 +22,19 @@ fun nullAble(){
     nullAb?.let {
         println(it)
     }
+    // Usage requireNotNull
+    /**
+     * `requireNotNull` is safer because it throws `IllegalArgumentException` with a clear message indicating invalid input,
+     * while `{!!}` throws a `NullPointerException` which is less descriptive and harder to debug.
+     * */
+    val name: String? = null
+    val nonNullName = requireNotNull(name){
+        "Name cannot be null"
+    }
+    println(nonNullName.length)
+
 }
 fun main() {
-    nonNull()
+    //nonNull()
     nullAble()
 }

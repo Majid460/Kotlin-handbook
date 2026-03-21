@@ -215,6 +215,8 @@ package coroutines
  * - `withContext` = switch thread, sequential inside, orphans launches
  * - `coroutineScope` = same thread, waits for ALL children
  * - `supervisorScope` = same as coroutineScope but failures are isolated
+ * - `viewModelScope` = runs on Dispatchers.Main `viewModelScope = CoroutineScope(
+ *     SupervisorJob() + Dispatchers.Main )`
  * - Never use `launch` inside `withContext` — use `coroutineScope` instead
  * - Always use `Dispatchers.IO` for network/database work
  * - Never use `runBlocking` on Android main thread

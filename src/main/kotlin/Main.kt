@@ -2,9 +2,7 @@ import coroutines.supervisorScopeFetchAll
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
-import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.runBlocking
-import coroutines.UserImpl
+import coroutines.flows.UserImpl
 
 suspend fun CoroutineScope.callAllCoroutines() {
     val job2 = async {

@@ -1,4 +1,4 @@
-package coroutines
+package coroutines.flows
 
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers

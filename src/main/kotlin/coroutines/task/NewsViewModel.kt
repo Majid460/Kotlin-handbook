@@ -9,6 +9,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.supervisorScope
+import kotlin.coroutines.cancellation.CancellationException
 import kotlin.system.measureTimeMillis
 
 
@@ -100,6 +101,21 @@ suspend fun fetchTopHeadlines(): List<String> {
 }
 
 suspend fun fetchUserProfile(): String {
+    delay(500)
+    throw RuntimeException("Auth expired")
+}
+
+suspend inline fun <R> runSuspendCatching(block: () -> R): Result<R> {
+    return try {
+        Result.success(block())
+    } catch (c: CancellationException) {
+        throw c
+    } catch (e: Throwable) {
+        Result.failure(e)
+    }
+}
+
+suspend fun fetchUserWithProfile(): Result<String> = runSuspendCatching {
     delay(500)
     throw RuntimeException("Auth expired")
 }

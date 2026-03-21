@@ -62,6 +62,11 @@ suspend fun createAChannel() {
     }
 
 }
+abstract class B{
+    fun a(){
+
+    }
+}
 suspend fun bufferedChannel() {
 
     val channel = Channel<String>(2)

@@ -1,7 +1,10 @@
 package coroutines
 
+import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
@@ -9,6 +12,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
+import kotlin.coroutines.CoroutineContext
 import kotlin.time.Duration.Companion.milliseconds
 
 /*
@@ -32,9 +36,22 @@ suspend fun CoroutineScope.launchAsBuilder(){
     println("Scope continues")
 }
 // It starts a new coroutine without blocking the rest of the scope, inside an existing coroutine scope.
+/**
+ * CoroutineStart defines how a coroutine starts execution. It controls whether the coroutine starts immediately, lazily, atomically, or undispatched on the current thread.
+ * ```
+ * DEFAULT        → scheduled, async start
+ * LAZY           → waits for start() or join()
+ * ATOMIC         → cannot be cancelled before start
+ * UNDISPATCHED   → runs immediately in current thread
+ *
+ * DEFAULT = start now
+ * LAZY = start later
+ * ATOMIC = cannot cancel before start
+ * UNDISPATCHED = run immediately here
+ *```*/
 suspend fun performBackgroundWork() = coroutineScope { // this: CoroutineScope
     // Starts a coroutine that runs without blocking the scope
-    val job =  this.launch {
+    val job =  this.launch(start = CoroutineStart.LAZY) {
         // Suspends to simulate background work
         delay(100.milliseconds)
         println("Sending notification in background")
@@ -51,7 +68,8 @@ suspend fun performBackgroundWork() = coroutineScope { // this: CoroutineScope
 
 suspend fun performBackgroundWorkWithoutJob() = coroutineScope { // this: CoroutineScope
     // Starts a coroutine that runs without blocking the scope
-     this.launch {
+    val context = Job() + Dispatchers.IO + CoroutineName("Default")
+     this.launch(context) {
         // Suspends to simulate background work
         delay(100.milliseconds)
         println("Sending notification in background")
