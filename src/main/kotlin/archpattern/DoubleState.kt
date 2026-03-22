@@ -1,6 +1,9 @@
-package be.business.composefoundation.archpattern
+package archpattern
+/*
+
 
 import androidx.compose.runtime.external.kotlinx.collections.immutable.PersistentList
+import kotlinx.coroutines.CancellationException
 
 package com.reference.uistate
 
@@ -44,7 +47,9 @@ import kotlinx.coroutines.launch
 // 1. MODEL
 // ─────────────────────────────────────────────────────────────────────────────
 
-/** A single product shown in the list. */
+*/
+/** A single product shown in the list. *//*
+
 @Immutable // tells Compose: this object never mutates → safe to skip recomposition
 data class Product(
     val id: Int,
@@ -57,6 +62,7 @@ data class Product(
 // 2. LOAD STATE — sealed, mutually exclusive async phases
 // ─────────────────────────────────────────────────────────────────────────────
 
+*/
 /**
  * Represents the async loading phase of the screen.
  *
@@ -66,31 +72,40 @@ data class Product(
  * Rule: always REPLACE entirely, never partially update.
  *   ✅ _state.update { it.copy(loadState = LoadState.Loading) }
  *   ❌ loadState.copy(...)  ← you'd never do this
- */
+ *//*
+
 @Immutable
 sealed class LoadState {
 
-    /** Nothing has been requested yet. Initial state. */
+    */
+/** Nothing has been requested yet. Initial state. *//*
+
     object Idle : LoadState()
 
-    /** A network/db request is in flight. */
+    */
+/** A network/db request is in flight. *//*
+
     object Loading : LoadState()
 
-    /**
+    */
+/**
      * Request completed successfully.
      *
      * @param products Truly immutable list — safe for Compose, safe from casting.
      *   Any update (e.g. add item) returns a NEW list, original untouched.
-     */
+     *//*
+
     data class Success(
         val products: PersistentList<Product> = persistentListOf()
     ) : LoadState()
 
-    /**
+    */
+/**
      * Request failed.
      *
      * @param message Human-readable error to show the user.
-     */
+     *//*
+
     data class Error(val message: String) : LoadState()
 }
 
@@ -99,6 +114,7 @@ sealed class LoadState {
 // 3. SCREEN STATE — data class, owns ALL screen state
 // ─────────────────────────────────────────────────────────────────────────────
 
+*/
 /**
  * The single source of truth for the entire screen.
  *
@@ -115,7 +131,8 @@ sealed class LoadState {
  * @param query    Current search query. Always available regardless of load phase.
  * @param isRefreshing Whether a pull-to-refresh is in progress.
  * @param loadState    The current async phase of the screen.
- */
+ *//*
+
 @Immutable
 data class ScreenState(
     val query: String = "",
@@ -128,7 +145,9 @@ data class ScreenState(
 // 4. FAKE REPOSITORY — stands in for real network/db layer
 // ─────────────────────────────────────────────────────────────────────────────
 
-/** Simulates a repository. Replace with your real implementation. */
+*/
+/** Simulates a repository. Replace with your real implementation. *//*
+
 class ProductRepository {
     suspend fun getProducts(query: String): List<Product> {
         // Replace with real API / Room call
@@ -145,6 +164,7 @@ class ProductRepository {
 // 5. VIEWMODEL
 // ─────────────────────────────────────────────────────────────────────────────
 
+*/
 /**
  * ViewModel for a search screen using the Double UI State pattern.
  *
@@ -168,14 +188,17 @@ class ProductRepository {
  *   → ScreenState(query="shoes", isRefreshing=true, loadState=Success([…]))
  *   → ScreenState(query="shoes", isRefreshing=false, loadState=Success([…new…]))
  * ```
- */
+ *//*
+
 class ProductViewModel(
     private val repository: ProductRepository = ProductRepository()
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(ScreenState())
 
-    /** Read-only state exposed to the UI. */
+    */
+/** Read-only state exposed to the UI. *//*
+
     val state = _state.asStateFlow()
 
     init {
@@ -184,19 +207,23 @@ class ProductViewModel(
 
     // ── Public API (called from UI) ──────────────────────────────────────────
 
-    /**
+    */
+/**
      * Called every time the user types in the search field.
      * Only [query] changes — [loadState] is untouched.
-     */
+     *//*
+
     fun onQueryChanged(query: String) {
         _state.update { it.copy(query = query) }
         loadProducts() // re-fetch with new query
     }
 
-    /**
+    */
+/**
      * Called when the user pulls to refresh.
      * Sets [isRefreshing] independently of [loadState].
-     */
+     *//*
+
     fun onRefresh() {
         _state.update { it.copy(isRefreshing = true) }
         loadProducts()
@@ -239,6 +266,7 @@ class ProductViewModel(
 // 6. SAFE COROUTINE HELPER
 // ─────────────────────────────────────────────────────────────────────────────
 
+*/
 /**
  * Safe alternative to [runCatching] for suspend functions.
  *
@@ -254,11 +282,12 @@ class ProductViewModel(
  *         onFailure = { … }  // CancellationException will never land here
  *     )
  * ```
- */
+ *//*
+
 suspend fun <T> suspendRunCatching(block: suspend () -> T): Result<T> {
     return try {
         Result.success(block())
-    } catch (e: kotlinx.coroutines.CancellationException) {
+    } catch (e: CancellationException) {
         throw e          // always rethrow — structured concurrency depends on this
     } catch (e: Throwable) {
         Result.failure(e)
@@ -270,6 +299,7 @@ suspend fun <T> suspendRunCatching(block: suspend () -> T): Result<T> {
 // 7. COMPOSE UI — how to consume the double state
 // ─────────────────────────────────────────────────────────────────────────────
 
+*/
 /*
 @Composable
 fun ProductScreen(viewModel: ProductViewModel = viewModel()) {
