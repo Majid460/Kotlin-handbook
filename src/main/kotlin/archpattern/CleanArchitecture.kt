@@ -639,14 +639,14 @@ class NewsDataMapper {
      */
     fun toDomain(dto: NewsDto): News {
         return News(
-            id          = dto.id,
-            title       = dto.title,
-            content     = dto.content,
-            imageUrl    = dto.imageUrl,
-            isBreaking  = dto.isBreaking,
+            id = dto.id,
+            title = dto.title,
+            content = dto.content,
+            imageUrl = dto.imageUrl,
+            isBreaking = dto.isBreaking,
             publishedAt = dto.publishedAt,
-            author      = dto.meta.author,   // flattened from nested NewsMetaDto
-            category    = dto.meta.category  // flattened from nested NewsMetaDto
+            author = dto.meta.author,   // flattened from nested NewsMetaDto
+            category = dto.meta.category  // flattened from nested NewsMetaDto
         )
     }
 
@@ -670,15 +670,15 @@ class NewsDataMapper {
      */
     fun toEntity(domain: News): NewsEntity {
         return NewsEntity(
-            id          = domain.id,
-            title       = domain.title,
-            content     = domain.content,
-            imageUrl    = domain.imageUrl,
-            isBreaking  = domain.isBreaking,
+            id = domain.id,
+            title = domain.title,
+            content = domain.content,
+            imageUrl = domain.imageUrl,
+            isBreaking = domain.isBreaking,
             publishedAt = domain.publishedAt,
-            author      = domain.author,
-            category    = domain.category,
-            cachedAt    = System.currentTimeMillis() // DB-only field added here
+            author = domain.author,
+            category = domain.category,
+            cachedAt = System.currentTimeMillis() // DB-only field added here
         )
     }
 
@@ -700,14 +700,14 @@ class NewsDataMapper {
      */
     fun toDomain(entity: NewsEntity): News {
         return News(
-            id          = entity.id,
-            title       = entity.title,
-            content     = entity.content,
-            imageUrl    = entity.imageUrl,
-            isBreaking  = entity.isBreaking,
+            id = entity.id,
+            title = entity.title,
+            content = entity.content,
+            imageUrl = entity.imageUrl,
+            isBreaking = entity.isBreaking,
             publishedAt = entity.publishedAt,
-            author      = entity.author,
-            category    = entity.category
+            author = entity.author,
+            category = entity.category
             // cachedAt intentionally omitted — not a business concern
         )
     }
@@ -764,13 +764,13 @@ class NewsUiMapper {
      */
     fun toUiModel(domain: News): NewsUiModel {
         return NewsUiModel(
-            id             = domain.id,
-            title          = domain.title,
-            imageUrl       = domain.imageUrl,
-            isBreaking     = domain.isBreaking,
-            formattedDate  = formatRelativeTime(domain.publishedAt),
-            authorLabel    = buildAuthorLabel(domain.author),
-            categoryBadge  = domain.category.uppercase(),
+            id = domain.id,
+            title = domain.title,
+            imageUrl = domain.imageUrl,
+            isBreaking = domain.isBreaking,
+            formattedDate = formatRelativeTime(domain.publishedAt),
+            authorLabel = buildAuthorLabel(domain.author),
+            categoryBadge = domain.category.uppercase(),
             contentPreview = buildContentPreview(domain.content)
         )
     }
@@ -790,16 +790,16 @@ class NewsUiMapper {
      * @return          Human-readable relative time string for display.
      */
     private fun formatRelativeTime(timestamp: Long): String {
-        val diffMs  = System.currentTimeMillis() - timestamp
+        val diffMs = System.currentTimeMillis() - timestamp
         val minutes = diffMs / (1_000L * 60)
-        val hours   = minutes / 60
-        val days    = hours / 24
+        val hours = minutes / 60
+        val days = hours / 24
 
         return when {
             minutes < 1L -> "Just now"
             minutes < 60L -> "$minutes minutes ago"
-            hours   < 24L -> "$hours hours ago"
-            else          -> "$days days ago"
+            hours < 24L -> "$hours hours ago"
+            else -> "$days days ago"
         }
     }
 
@@ -845,9 +845,9 @@ class NewsUiMapper {
 
 
 /**
-   `  ════════════════════════════════════════════════════════════════════════`
-    ## QUICK REFERENCE
- `    ════════════════════════════════════════════════════════════════════════`
+`  ════════════════════════════════════════════════════════════════════════`
+## QUICK REFERENCE
+`    ════════════════════════════════════════════════════════════════════════`
 
  * ```
  *  MODEL LOCATION TABLE
@@ -887,6 +887,23 @@ class NewsUiMapper {
  *  cachedAt inside NewsUiModel              → WRONG
  *  isSelected inside News (domain)          → WRONG
  * ════════════════════════════════════════════════════════════════════════
- * ```
+ * ## What About UiModel?
+ *
+ * UiModel also has ZERO nullable fields
+ * because it receives data from Domain
+ * which already has ZERO nullable fields
+ *
+ * The null handling chain:
+ *
+ * DTO (nullable allowed)
+ *     ↓
+ * Mapper (resolves ALL nulls)
+ *     ↓
+ * Domain (zero nulls)
+ *     ↓
+ * UiModel (zero nulls)
+ *     ↓
+ * UI (just renders — no null checks ever)
+ *
  */
 fun quickRefTable() = Unit
