@@ -1,42 +1,7 @@
-import coroutines.flows.UserImpl
-import coroutines.supervisorScopeFetchAll
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.async
-import kotlinx.coroutines.awaitAll
+package basic
 
-suspend fun CoroutineScope.callAllCoroutines() {
-    val job2 = async {
-        supervisorScopeFetchAll()
-    }
-    awaitAll(job2)
-}
 /**
- * @param T : means a extension function on Type T
- * @param R: means it has receiver
- * @param block :T.() -> R Lambda with receiver
- * ==========
- * `inline`: Removes: Function call , Lambda allocation
- * @return the lambda on the object equivalent to:  this.block()
- *
- * */
-inline fun <T, R> T.doEveryThing(block: T.() -> R) :R {
-    return block(this)
-}
-
-fun main() {
-    println("Starting a Coroutine")
-   // UserImpl()
-    val a = "S"
-    val res =  a.doEveryThing {
-         println("Here")
-     }
-//    runBlocking {
-//        coroutineScope {
-//            callAllCoroutines()
-//        }
-//    }
-}
-/**
+ * ```
  * Scope Functions Cheat Sheet
  *
  * These functions execute a block of code in the context of an object.
@@ -126,5 +91,7 @@ fun main() {
  * - Need same object? → apply / also
  * - Prefer `this`? → run / apply
  * - Prefer `it`? → let / also
+ * ```
  */
-object Scope
+class ScopeFunctions {
+}

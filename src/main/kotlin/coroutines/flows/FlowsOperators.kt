@@ -3,6 +3,7 @@ package coroutines.flows
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.channelFlow
+import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.flatMapMerge
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
@@ -45,6 +46,7 @@ fun getStandardNotifications(): Flow<String> = flow {
     delay(600)
     emit("Notification: New message")
 }
+
 /**
  * One of the most common use cases for `channelFlow` is to collect data from multiple sources
  * concurrently and merge them into a single stream. The `ProducerScope’s` ability to launch
@@ -76,7 +78,52 @@ suspend fun channelFlowSimulation() {
     }
 }
 
+/** ```
+ * Debounce delays execution until a certain time has passed without new events. It ensures only the last event is processed, commonly used in search inputs to avoid excessive API calls.
+ * After each emission → start a timer
+ * If a new value comes before timer ends → cancel previous one
+ *
+ * 👉 Only emit when:
+ *
+ * No new value arrives within 1000ms
+ *
+ * ### It only emit if the value arrives after the debounce time
+ * */
+fun debounce() = flow {
+        emit(1)
+        delay(990)
+        emit(2)
+        delay(10) // it asks on every emission: Did 1000ms pass before next emission?
+        emit(3)
+        delay(1010)
+        emit(4)
+        delay(1010)
+        emit(5)
+    }.debounce(1000)
+
+/**
+ * ```
+ * Conflates flow emissions via conflated channel and runs collector in a separate coroutine.
+ * The effect of this is that emitter is never suspended due to a slow collector,
+ * but collector always gets the most recent value emitted.
+ *
+ * This is a shortcut for buffer(capacity = 0, onBufferOverflow = BufferOverflow.DROP_OLDEST). See the buffer operator for other configuration options.
+ * A shortcut to a buffer that only keeps the latest element as created by buffer(onBufferOverflow = BufferOverflow.DROP_OLDEST).
+ *
+ *
+ * */
+fun conflate() = flow{
+        for (i in 1..30) {
+            delay(100)
+            emit(i)
+        }
+}
+
 fun main() = runBlocking {
- //   flatMapMerge()
-    channelFlowSimulation()
+    //   flatMapMerge()
+    // channelFlowSimulation()
+    debounce().collect {
+        println(it)
+    }
+
 }

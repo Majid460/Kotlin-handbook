@@ -5,7 +5,6 @@ import io.mockk.mockk
 import io.mockk.verify
 import junit.framework.TestCase.assertFalse
 import junit.framework.TestCase.assertTrue
-import org.junit.After
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.DefaultAsserter.assertNotNull
